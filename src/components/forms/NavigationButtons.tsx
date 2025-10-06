@@ -15,7 +15,7 @@ const NavigationButtons: React.FC<Props> = ({ next, prev, isLastStep, onSubmit }
         <Button
           type="button"
           onClick={prev}
-          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+          className="px-4 py-2 bg-green-500 rounded hover:bg-gray-400"
         >
           Previous
         </Button>
@@ -25,7 +25,7 @@ const NavigationButtons: React.FC<Props> = ({ next, prev, isLastStep, onSubmit }
         <Button
           type="button"
           onClick={onSubmit}
-          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-red-700"
+          className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-red-700"
         >
           Submit
         </Button>

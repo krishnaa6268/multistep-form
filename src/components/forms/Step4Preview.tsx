@@ -18,19 +18,17 @@ const Step4Preview: React.FC = () => {
     } else {
       setPictureUrl(undefined);
     }
-  }, [data.profile?.previewUrl, data.profile?.pictureUrl]);
-
+  }, [data.profile?.pictureUrl, data.profile?.previewUrl]);
 
   const handleEdit = (step: number) => {
     dispatch(setStep(step));
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-4 lg:p-8">
+    <div className="bg-white rounded-2xl shadow-lg p-4 lg:p-8 w-full">
       <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-3">
         Review Your Information
       </h2>
-
       <div className="mb-8">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold text-gray-800 border-b pb-3">
@@ -43,12 +41,12 @@ const Step4Preview: React.FC = () => {
             <Pencil size={16} /> Edit
           </button>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
-          <p><span className="font-medium">Full Name:</span> {data.fullName}</p>
-          <p><span className="font-medium">Username:</span> {data.username}</p>
-          <p><span className="font-medium">Email:</span> {data.email}</p>
-          <p><span className="font-medium">Mobile:</span> {data.number}</p>
-          <p><span className="font-medium">Gender:</span> {data.gender}</p>
+        <div className="w-full grid md:grid-cols-2 gap-4 text-gray-700">
+          <p className="break-words"><span className="font-medium">Full Name:</span> {data.fullName}</p>
+          <p className="break-words"><span className="font-medium">Username:</span> {data.username}</p>
+          <p className="break-words"><span className="font-medium">Email:</span> {data.email}</p>
+          <p className="break-words"><span className="font-medium">Mobile:</span> {data.number}</p>
+          <p className="break-words"><span className="font-medium">Gender:</span> {data.gender}</p>
         </div>
       </div>
 
@@ -64,9 +62,9 @@ const Step4Preview: React.FC = () => {
             <Pencil size={16} /> Edit
           </button>
         </div>
-        <div className="flex flex-row gap-4 text-gray-700">
-          <div className="flex flex-col gap-2">
-            <span className="block font-medium">Profile Picture:</span>
+        <div className="flex flex-col md:flex-row gap-6">
+          <div className="flex-shrink-0">
+            <span className="block font-medium mb-2 text-gray-700">Profile Picture:</span>
             {pictureUrl ? (
               <img
                 src={pictureUrl}
@@ -79,9 +77,10 @@ const Step4Preview: React.FC = () => {
               </div>
             )}
           </div>
-          <div className="flex flex-col gap-2">
-            <p><span className="block font-medium">Bio:</span> {data.profile?.bio}</p>
-            <p><span className="block font-medium">Date of Birth:</span> {data.profile?.dob}</p>
+
+          <div className="flex-1 grid md:grid-cols-2 gap-4 text-gray-700">
+            <p><span className="font-medium">Bio:</span> {data.profile?.bio || "-"}</p>
+            <p><span className="font-medium">Date of Birth:</span> {data.profile?.dob || "-"}</p>
           </div>
         </div>
       </div>
@@ -98,10 +97,10 @@ const Step4Preview: React.FC = () => {
             <Pencil size={16} /> Edit
           </button>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
-          <p><span className="font-medium">Address Line1:</span> {data.address?.line1}</p>
-          <p><span className="font-medium">Address Line 2:</span> {data.address?.line2}</p>
-          <p><span className="font-medium">Landmark:</span> {data.address?.landmark}</p>
+        <div className="w-full grid md:grid-cols-2 gap-4 text-gray-700">
+          <p className="break-words"><span className="font-medium">Address Line1:</span> {data.address?.line1}</p>
+          <p className="break-words"><span className="font-medium">Address Line 2:</span> {data.address?.line2}</p>
+          <p className="break-words"><span className="font-medium">Landmark:</span> {data.address?.landmark}</p>
           <p><span className="font-medium">City:</span> {data.address?.city}</p>
           <p><span className="font-medium">State:</span> {data.address?.state}</p>
           <p><span className="font-medium">Zip Code:</span> {data.address?.zip}</p>
@@ -114,7 +113,7 @@ const Step4Preview: React.FC = () => {
         isLastStep
         onSubmit={() => {
           alert("Form submitted!");
-        //  localStorage.removeItem("formData");
+          // localStorage.removeItem("formData");
           window.location.reload();
         }}
       />

@@ -8,54 +8,69 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
+import { useForm } from "react-hook-form";
+
+type ProfileFormValues = {
+  bio: string;
+  dob: string;
+  picture?: File | null;
+  pictureUrl?: string;
+};
 
 const Step2Profile: React.FC = () => {
-  const BASE_URL: string = "http://192.168.29.28:9001/upload";
-  const SERVER_STORE: string = "http://192.168.29.28:9001/storage/";
-  let newURL: string;
+
+  //--------Ravi Lodhi's Server Endpoints----------------
+  // const BASE_URL = "http://192.168.29.28:9001/upload";
+  //const SERVER_STORE = "http://192.168.29.28:9001/storage/";
+
+  // const BASE_URL = "https://cirrhosed-centesimally-lindsay.ngrok-free.dev/upload";
+  // const SERVER_STORE = "https://cirrhosed-centesimally-lindsay.ngrok-free.dev/storage/";
+
+  //--------Vimal's Server Endpoints----------------
+  const BASE_URL = "https://0694857c54a5.ngrok-free.app/upload/"
+  const SERVER_STORE = "https://0694857c54a5.ngrok-free.app/storage/"
 
   const dispatch = useDispatch();
   const profile = useSelector((state: RootState) => state.form.data.profile);
 
-  const [form, setForm] = useState(
-    profile || { bio: "", dob: "", picture: null, pictureUrl: "", previewUrl: "" }
-  );
-
   const [isUploading, setIsUploading] = useState(false);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors, isValid },
+  } = useForm<ProfileFormValues>({
+    mode: "onChange",
+    defaultValues: {
+      bio: profile?.bio || "",
+      dob: profile?.dob || "",
+      picture: profile?.picture || "",
+      pictureUrl: profile?.pictureUrl || "",
+    },
+  });
+
+  const watchAll = watch();
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-
       const formData = new FormData();
       formData.append("file", file);
+
       try {
         setIsUploading(true);
-        const res = await fetch(BASE_URL, {
-          method: "POST",
-          body: formData,
-        });
-        if (!res.ok) {
-          throw new Error(`Upload failed: ${res.statusText}`);
-        }
+        const res = await fetch(BASE_URL, { method: "POST", body: formData });
+        if (!res.ok) throw new Error(`Upload failed: ${res.statusText}`);
         const data = await res.json();
+        const fileName = data.meta.filename;
+        const newUrl = SERVER_STORE + fileName;
+        //{ console.log(newUrl, fileName) }
 
-        newURL = SERVER_STORE + data.meta.filename;
-        console.log(newURL);
-
-        setForm(prev => ({
-          ...prev,
-          pictureUrl: newURL,
-        }));
-
-        //const previewUrl = URL.createObjectURL(file);
-        setForm(prev => ({ ...prev, picture: file, newURL }));
+        setValue("picture", fileName);
+        setValue("pictureUrl", newUrl);
+        dispatch(updateForm({ profile: { ...watchAll, picture: fileName, pictureUrl: newUrl } }));
       } catch (err) {
         console.error("Upload failed:", err);
       } finally {
@@ -64,13 +79,23 @@ const Step2Profile: React.FC = () => {
     }
   };
 
-  const handleNext = () => {
-    dispatch(updateForm({ profile: form }));
+  const handleReduxChange =
+    (field: keyof ProfileFormValues) =>
+      (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setValue(field, e.target.value, { shouldValidate: true });
+        dispatch(updateForm({ profile: { ...watchAll, [field]: e.target.value } }));
+      };
+
+  const onSubmit = (data: ProfileFormValues) => {
+    dispatch(updateForm({ profile: data }));
     dispatch(nextStep());
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-4 lg:p-8">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="bg-white rounded-2xl shadow-lg p-4 lg:p-8"
+    >
       <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-3">
         Profile Information
       </h2>
@@ -81,67 +106,80 @@ const Step2Profile: React.FC = () => {
             Bio <span className="text-red-500">*</span>
           </Label>
           <Textarea
-            name="bio"
-            value={form.bio || ""}
-            onChange={handleChange}
             placeholder="Write something about yourself..."
             rows={4}
-            className="w-full"
+            {...register("bio", {
+              required: "Bio is required",
+              minLength: {
+                value: 10,
+                message: "Bio must be at least 10 characters",
+              },
+              onChange: handleReduxChange("bio"),
+            })}
           />
+          {errors.bio && (
+            <p className="text-red-500 text-sm mt-1">{errors.bio.message}</p>
+          )}
         </div>
 
         <div className="flex lg:flex-row flex-col gap-4">
-          <div>
+          <div className="flex-1">
             <Label htmlFor="dob" className="mb-1 text-gray-700 font-medium block">
               Date of Birth <span className="text-red-500">*</span>
             </Label>
             <Input
               type="date"
-              name="dob"
-              value={form.dob}
-              onChange={handleChange}
-              className="w-full"
+              {...register("dob", {
+                required: "Date of Birth is required",
+                onChange: handleReduxChange("dob"),
+              })}
             />
+            {errors.dob && (
+              <p className="text-red-500 text-sm mt-1">{errors.dob.message}</p>
+            )}
           </div>
 
-          <div>
+          <div className="flex-1">
             <Label htmlFor="picture" className="mb-1 text-gray-700 font-medium block">
               Profile Picture
             </Label>
             <Input
               type="file"
-              name="picture"
               accept="image/png, image/jpeg"
               onChange={handleFileChange}
               className="w-full cursor-pointer"
             />
-
+            <Label htmlFor="picture" className="mb-1 text-gray-700 font-medium block">
+              { }
+            </Label>
             {isUploading && <p className="text-blue-500 mt-1">Uploading...</p>}
-
-            {form.pictureUrl && (
-              <img
-                src={form.pictureUrl}
-                alt="Preview"
-                className="mt-2 h-20 w-20 object-cover rounded-full border"
-              />
+            {watchAll.pictureUrl && (
+              <div className=" mt-3 flex align-center justify-center lg:justify-left ">
+                <img
+                  src={watchAll.pictureUrl}
+                  alt="Preview"
+                  className="mt-2 h-20 w-20 object-cover rounded-full border"
+                />
+              </div>
             )}
-
-            {/* {form.pictureUrl && (
-              <p className="text-green-600 text-sm mt-1">
-                Uploaded! ({form.pictureUrl})
-              </p>
-            )} */}
           </div>
         </div>
       </div>
 
-      <div className="mt-8">
+      <div className="mt-10">
         <NavigationButtons
           prev={() => dispatch(prevStep())}
-          next={handleNext}
+
+          // next={() => {
+          //   if (isValid) handleSubmit(onSubmit)();
+          // }}
+
+          next={() => {
+            handleSubmit(onSubmit)(); // triggers validation on all fields immediately
+          }}
         />
       </div>
-    </div>
+    </form>
   );
 };
 
