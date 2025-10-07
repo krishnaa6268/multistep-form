@@ -112,9 +112,36 @@ const Step4Preview: React.FC = () => {
         prev={() => dispatch(prevStep())}
         isLastStep
         onSubmit={() => {
-          alert("Form submitted!");
+          const combinedData = {
+            basicInfo: {
+              fullName: data.fullName,
+              username: data.username,
+              email: data.email,
+              number: data.number,
+              gender: data.gender,
+            },
+            profileInfo: {
+              bio: data.profile?.bio,
+              dob: data.profile?.dob,
+              pictureUrl: data.profile?.pictureUrl,
+            },
+            addressInfo: {
+              line1: data.address?.line1,
+              line2: data.address?.line2,
+              landmark: data.address?.landmark,
+              city: data.address?.city,
+              state: data.address?.state,
+              zip: data.address?.zip,
+              country: data.country,
+            },
+          };
+          alert(
+            "✅ Form Submitted Successfully!\n\n" +
+            JSON.stringify(combinedData, null, 2)
+          );
+
           // sessionStorage.removeItem("formData");
-          window.location.reload();
+         window.location.reload();
         }}
       />
     </div>
