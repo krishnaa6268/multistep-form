@@ -136,16 +136,15 @@ const Step4Preview: React.FC = () => {
             },
           };
           alert(
-            "✅ Form Submitted Successfully!\n\n" +
+            "Form Submitted Successfully!\n\n" +
             JSON.stringify(combinedData, null, 2)
           );
 
           // sessionStorage.removeItem("formData");
-         window.location.reload();
+          window.location.reload();
         }}
       />
     </div>
   );
 };
-
 export default Step4Preview;

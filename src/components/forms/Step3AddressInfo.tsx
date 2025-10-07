@@ -46,8 +46,18 @@ const Step3Address: React.FC = () => {
         if (!value.trim()) message = "Landmark is required.";
         break;
       case "zip":
-        if (!value.trim()) message = "Zip Code is required.";
-        else if (!/^\d{5,6}$/.test(value)) message = "Zip Code must be 5 or 6 digits.";
+        if (!value.trim()) {
+          message = "Zip Code is required.";
+        }
+        else if (!/^\d+$/.test(value)) {
+          message = "Zip Code must contain only numbers.";
+        }
+        else if (value.length < 5 || value.length > 6) {
+          message = "Zip Code must be 5 or 6 digits long.";
+        } 
+        else if (/^0/.test(value)) {
+          message = "Zip Code cannot start with zero.";
+        }
         break;
       case "state":
         if (!value) message = "State is required.";
@@ -72,7 +82,7 @@ const Step3Address: React.FC = () => {
     const selectedState = e.target.value;
     setForm({ ...form, state: selectedState, city: "" });
     handleCity(selectedState);
-    validateField("state", selectedState); 
+    validateField("state", selectedState);
   };
 
   const handleSelectCityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -111,7 +121,7 @@ const Step3Address: React.FC = () => {
   return (
     <div className="bg-white rounded-2xl shadow-lg bg-white/80 backdrop-blur-sm border border-gray-100 p-6 lg:p-10 transition-all duration-300">
       <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-3">
-        Address Information 
+        Address Information
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -175,7 +185,7 @@ const Step3Address: React.FC = () => {
           {errors.zip && <p className="text-red-500 text-sm">{errors.zip}</p>}
         </div>
 
-        
+
 
         <div>
           <Label htmlFor="state" className="mb-1 text-gray-700 font-medium block">
