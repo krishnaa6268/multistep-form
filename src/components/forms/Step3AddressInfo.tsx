@@ -9,13 +9,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 const Step3Address: React.FC = () => {
-
   const dispatch = useDispatch();
   const address = useSelector((state: RootState) => state.form.data.address);
   const country = useSelector((state: RootState) => state.form.data?.country || "");
 
   const [citiesForState, setCitiesForState] = useState<string[]>([]);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [touched, setTouched] = useState<{ [key: string]: boolean }>({});
 
   const [form, setForm] = useState(
     address || {
@@ -32,6 +32,10 @@ const Step3Address: React.FC = () => {
     if (form.state) handleCity(form.state);
   }, [form.state]);
 
+  useEffect(() => {
+    dispatch(updateForm({ address: form }));
+  }, [form, dispatch]);
+
   const validateField = (name: string, value: string) => {
     let message = "";
 
@@ -46,18 +50,10 @@ const Step3Address: React.FC = () => {
         if (!value.trim()) message = "Landmark is required.";
         break;
       case "zip":
-        if (!value.trim()) {
-          message = "Zip Code is required.";
-        }
-        else if (!/^\d+$/.test(value)) {
-          message = "Zip Code must contain only numbers.";
-        }
-        else if (value.length < 5 || value.length > 6) {
-          message = "Zip Code must be 5 or 6 digits long.";
-        } 
-        else if (/^0/.test(value)) {
-          message = "Zip Code cannot start with zero.";
-        }
+        if (!value.trim()) message = "Zip Code is required.";
+        else if (!/^\d+$/.test(value)) message = "Zip Code must contain only numbers.";
+        else if (value.length < 5 || value.length > 6) message = "Zip Code must be 5 or 6 digits long.";
+        else if (/^0/.test(value)) message = "Zip Code cannot start with zero.";
         break;
       case "state":
         if (!value) message = "State is required.";
@@ -70,25 +66,37 @@ const Step3Address: React.FC = () => {
     }
 
     setErrors((prev) => ({ ...prev, [name]: message }));
+    return message === "";
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    setForm((prev) => ({ ...prev, [name]: value }));
+
+    if (touched[name]) {
+      validateField(name, value);
+    }
+  };
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setTouched((prev) => ({ ...prev, [name]: true }));
     validateField(name, value);
   };
 
   const handleSelectStateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedState = e.target.value;
-    setForm({ ...form, state: selectedState, city: "" });
+    setForm((prev) => ({ ...prev, state: selectedState, city: "" }));
     handleCity(selectedState);
-    validateField("state", selectedState);
+
+    if (touched.state) validateField("state", selectedState);
   };
 
   const handleSelectCityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedCity = e.target.value;
-    setForm({ ...form, city: selectedCity });
-    validateField("city", selectedCity);
+    setForm((prev) => ({ ...prev, city: selectedCity }));
+
+    if (touched.city) validateField("city", selectedCity);
   };
 
   const handleCity = (stateName: string) => {
@@ -102,13 +110,17 @@ const Step3Address: React.FC = () => {
   };
 
   const validateAll = () => {
-    const fields = ["line1", "line2", "landmark", "zip", "state", "city"] as const;
-    fields.forEach((f) => validateField(f, form[f]));
-    return fields.every((f) => {
-      const val = form[f];
-      if (!val.trim && !val) return false;
-      return !errors[f];
+    const fields = ["line1", "line2", "landmark", "zip", "state", "city"];
+    const newTouched = Object.fromEntries(fields.map((f) => [f, true]));
+    setTouched(newTouched);
+
+    let isValid = true;
+    fields.forEach((f) => {
+      const valid = validateField(f, form[f]);
+      if (!valid) isValid = false;
     });
+
+    return isValid;
   };
 
   const handleNext = () => {
@@ -127,7 +139,7 @@ const Step3Address: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="col-span-1 md:col-span-2">
           <Label htmlFor="line1" className="mb-1 text-gray-700 font-medium block">
-            Address Line 1 <span className="text-red-500">*</span>
+            Address Line 1<span className="text-red-500">*</span>
           </Label>
           <Input
             type="text"
@@ -135,9 +147,10 @@ const Step3Address: React.FC = () => {
             placeholder="House No, Street"
             value={form.line1}
             onChange={handleChange}
-            className={`mt-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-xl transition-all w-full ${errors.line1 ? "border-red-500" : ""}`}
+            onBlur={handleBlur}
+            className={`mt-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-xl transition-all w-full ${errors.line1 && touched.line1 ? "border-red-500" : ""}`}
           />
-          {errors.line1 && <p className="text-red-500 text-sm">{errors.line1}</p>}
+          {errors.line1 && touched.line1 && <p className="text-red-500 text-sm">{errors.line1}</p>}
         </div>
 
         <div className="col-span-1 md:col-span-2">
@@ -150,9 +163,10 @@ const Step3Address: React.FC = () => {
             placeholder="Apartment, Floor, Block"
             value={form.line2}
             onChange={handleChange}
-            className={`mt-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-xl transition-all w-full ${errors.line2 ? "border-red-500" : ""}`}
+            onBlur={handleBlur}
+            className={`mt-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-xl transition-all w-full ${errors.line2 && touched.line2 ? "border-red-500" : ""}`}
           />
-          {errors.line2 && <p className="text-red-500 text-sm">{errors.line2}</p>}
+          {errors.line2 && touched.line2 && <p className="text-red-500 text-sm">{errors.line2}</p>}
         </div>
 
         <div>
@@ -165,9 +179,10 @@ const Step3Address: React.FC = () => {
             placeholder="Nearby Landmark"
             value={form.landmark}
             onChange={handleChange}
-            className={`mt-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-xl transition-all w-full ${errors.landmark ? "border-red-500" : ""}`}
+            onBlur={handleBlur}
+            className={`mt-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-xl transition-all w-full ${errors.landmark && touched.landmark ? "border-red-500" : ""}`}
           />
-          {errors.landmark && <p className="text-red-500 text-sm">{errors.landmark}</p>}
+          {errors.landmark && touched.landmark && <p className="text-red-500 text-sm">{errors.landmark}</p>}
         </div>
 
         <div>
@@ -180,12 +195,11 @@ const Step3Address: React.FC = () => {
             placeholder="Postal / Zip Code"
             value={form.zip}
             onChange={handleChange}
-            className={`mt-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-xl transition-all w-full ${errors.zip ? "border-red-500" : ""}`}
+            onBlur={handleBlur}
+            className={`mt-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-xl transition-all w-full ${errors.zip && touched.zip ? "border-red-500" : ""}`}
           />
-          {errors.zip && <p className="text-red-500 text-sm">{errors.zip}</p>}
+          {errors.zip && touched.zip && <p className="text-red-500 text-sm">{errors.zip}</p>}
         </div>
-
-
 
         <div>
           <Label htmlFor="state" className="mb-1 text-gray-700 font-medium block">
@@ -195,8 +209,8 @@ const Step3Address: React.FC = () => {
             name="state"
             value={form.state}
             onChange={handleSelectStateChange}
-            className={`w-full mt-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-xl p-3 bg-white text-gray-700 transition-all 
-              ${errors.state ? "border-red-500" : "border-gray-300"}`}
+            onBlur={handleBlur}
+            className={`w-full mt-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-xl p-3 bg-white text-gray-700 transition-all ${errors.state && touched.state ? "border-red-500" : "border-gray-300"}`}
           >
             <option value="">Select your state</option>
             {states
@@ -207,7 +221,7 @@ const Step3Address: React.FC = () => {
                 </option>
               ))}
           </select>
-          {errors.state && <p className="text-red-500 text-sm">{errors.state}</p>}
+          {errors.state && touched.state && <p className="text-red-500 text-sm">{errors.state}</p>}
         </div>
 
         <div>
@@ -218,9 +232,9 @@ const Step3Address: React.FC = () => {
             name="city"
             value={form.city}
             onChange={handleSelectCityChange}
+            onBlur={handleBlur}
             disabled={citiesForState.length === 0}
-            className={`w-full mt-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-xl p-3 bg-white text-gray-700 transition-all
-              ${errors.city ? "border-red-500" : "border-gray-300"}`}
+            className={`w-full mt-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-xl p-3 bg-white text-gray-700 transition-all ${errors.city && touched.city ? "border-red-500" : "border-gray-300"}`}
           >
             <option value="">Select your city</option>
             {citiesForState.map((city) => (
@@ -229,7 +243,7 @@ const Step3Address: React.FC = () => {
               </option>
             ))}
           </select>
-          {errors.city && <p className="text-red-500 text-sm">{errors.city}</p>}
+          {errors.city && touched.city && <p className="text-red-500 text-sm">{errors.city}</p>}
         </div>
 
         <div>
