@@ -27,8 +27,8 @@ const Step2Profile: React.FC = () => {
   // const SERVER_STORE = "https://cirrhosed-centesimally-lindsay.ngrok-free.dev/storage/";
 
   //--------Vimal's Server Endpoints----------------
-  const BASE_URL = "https://0694857c54a5.ngrok-free.app/upload/"
-  const SERVER_STORE = "https://0694857c54a5.ngrok-free.app/storage/"
+  const BASE_URL = "https://9d43c5971bff.ngrok-free.app/upload/"
+  const SERVER_STORE = "https://9d43c5971bff.ngrok-free.app/storage/"
 
   const dispatch = useDispatch();
   const profile = useSelector((state: RootState) => state.form.data.profile);
@@ -94,7 +94,7 @@ const Step2Profile: React.FC = () => {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="bg-white rounded-2xl shadow-lg p-4 lg:p-8"
+      className="bg-white rounded-2xl shadow-lg bg-white/80 backdrop-blur-sm border border-gray-100 p-6 lg:p-10 transition-all duration-300"
     >
       <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-3">
         Profile Information
@@ -107,6 +107,7 @@ const Step2Profile: React.FC = () => {
           </Label>
           <Textarea
             placeholder="Write something about yourself..."
+            className="mt-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-xl transition-all resize-none"
             rows={4}
             {...register("bio", {
               required: "Bio is required",
@@ -129,6 +130,7 @@ const Step2Profile: React.FC = () => {
             </Label>
             <Input
               type="date"
+              className="mt-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-xl transition-all w-full"
               {...register("dob", {
                 required: "Date of Birth is required",
                 onChange: handleReduxChange("dob"),
@@ -143,17 +145,32 @@ const Step2Profile: React.FC = () => {
             <Label htmlFor="picture" className="mb-1 text-gray-700 font-medium block">
               Profile Picture
             </Label>
-            <Input
-              type="file"
-              accept="image/png, image/jpeg"
-              onChange={handleFileChange}
-              className="w-full cursor-pointer"
-            />
-            <Label htmlFor="picture" className="mb-1 text-gray-700 font-medium block">
-              { }
-            </Label>
-            {isUploading && <p className="text-blue-500 mt-1">Uploading...</p>}
-            {watchAll.pictureUrl && (
+            <div className="mt-2 border-2 border-dashed border-gray-300 rounded-xl p-4 flex flex-col items-center justify-center hover:border-blue-400 hover:bg-blue-50 transition-all cursor-pointer">
+              <Input
+                type="file"
+                accept="image/png, image/jpeg"
+                id="picture"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+              <label htmlFor="picture" className="text-blue-600 font-medium cursor-pointer">
+                {isUploading ? "Uploading..." : "Click to upload"}
+              </label>
+              <p className="text-xs text-gray-500 mt-1">
+                PNG, JPG up to 2MB
+              </p>
+
+              {watchAll.pictureUrl && (
+                <div className="mt-4 flex items-center justify-center">
+                  <img
+                    src={watchAll.pictureUrl}
+                    alt="Profile Preview"
+                    className="h-24 w-24 rounded-full border-4 border-white shadow-md object-cover ring-2 ring-blue-200 transition-all hover:scale-105"
+                  />
+                </div>
+              )}
+            </div>
+            {/* {watchAll.pictureUrl && (
               <div className=" mt-3 flex align-center justify-center lg:justify-left ">
                 <img
                   src={watchAll.pictureUrl}
@@ -161,7 +178,7 @@ const Step2Profile: React.FC = () => {
                   className="mt-2 h-20 w-20 object-cover rounded-full border"
                 />
               </div>
-            )}
+            )} */}
           </div>
         </div>
       </div>

@@ -54,7 +54,7 @@ const Step1BasicInfo: React.FC = () => {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="bg-white rounded-2xl shadow-lg p-4 lg:p-8"
+      className="bg-white rounded-2xl shadow-lg bg-white/80 backdrop-blur-sm border border-gray-100 p-6 lg:p-10 transition-all duration-300"
     >
       <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-3">
         Basic Information
@@ -67,6 +67,7 @@ const Step1BasicInfo: React.FC = () => {
           </Label>
           <Input
             type="text"
+            className="mt-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-xl transition-all w-full"
             placeholder="Enter your full name"
             {...register("fullName", {
               required: "Full name is required",
@@ -95,10 +96,15 @@ const Step1BasicInfo: React.FC = () => {
           <Label htmlFor="username">Username <span className="text-red-500">*</span></Label>
           <Input
             type="text"
+            className="mt-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-xl transition-all w-full"
             placeholder="Choose a username"
             {...register("username", {
               required: "Username is required",
               minLength: { value: 3, message: "Min 3 characters" },
+              maxLength: {
+                value: 10,
+                message: "Full name must be at most 10 characters",
+              },
               pattern: {
                 value: /^[a-zA-Z0-9_]+$/,
                 message: "Only letters, numbers, underscores allowed",
@@ -115,6 +121,7 @@ const Step1BasicInfo: React.FC = () => {
           <Label htmlFor="email">Email <span className="text-red-500">*</span></Label>
           <Input
             type="email"
+            className="mt-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-xl transition-all w-full"
             placeholder="example@mail.com"
             {...register("email", {
               required: "Email is required",
@@ -134,6 +141,7 @@ const Step1BasicInfo: React.FC = () => {
           <Label htmlFor="number">Mobile <span className="text-red-500">*</span></Label>
           <Input
             type="text"
+            className="mt-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-xl transition-all w-full"
             placeholder="10-digit number"
             {...register("number", {
               required: "Mobile number is required",
@@ -156,15 +164,16 @@ const Step1BasicInfo: React.FC = () => {
               <label
                 key={g}
                 className={`px-2 lg:px-3 py-2 border rounded-full cursor-pointer ${watch("gender") === g
-                  ? "bg-cyan-500 text-white border-cyan-500"
+                  ? " bg-gradient-to-r from-blue-500 to-indigo-600  text-white border-cyan-500"
                   : "border-gray-300 text-gray-700 hover:bg-gray-100"
                   }`}
               >
                 <input
                   type="radio"
+                  className="mt-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-xl transition-all w-full hidden"
                   value={g}
                   {...register("gender", { required: "Please select your gender", onChange: handleReduxUpdate("gender") })}
-                  className="hidden"
+                 
                 />
                 {g.charAt(0).toUpperCase() + g.slice(1)}
               </label>
@@ -175,14 +184,16 @@ const Step1BasicInfo: React.FC = () => {
           )}
         </div>
 
-        <div>
-          <Label htmlFor="country">Country <span className="text-red-500">*</span></Label>
+        <div className="flex flex-col">
+          <Label htmlFor="country" className="font-medium text-gray-700">
+            Country <span className="text-red-500">*</span>
+          </Label>
           <select
             {...register("country", {
               required: "Please select your country",
               onChange: handleReduxUpdate("country"),
             })}
-            className="w-full border border-gray-300 rounded-lg p-2 bg-white text-gray-700"
+            className="mt-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-xl p-3 bg-white text-gray-700 transition-all"
           >
             <option value="">Select your country</option>
             {countries.map((c) => (
@@ -192,12 +203,15 @@ const Step1BasicInfo: React.FC = () => {
             ))}
           </select>
           {errors.country && (
-            <p className="text-red-500 text-sm mt-1">{errors.country.message}</p>
+            <p className="text-sm text-red-500 mt-1">
+              {errors.country.message}
+            </p>
           )}
         </div>
       </div>
+      
 
-      <div className="mt-8">
+      <div className="mt-8 flex justify-center">
         <NavigationButtons
           // next={() => {
           //   if (isValid) handleSubmit(onSubmit)();

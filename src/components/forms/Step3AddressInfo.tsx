@@ -72,7 +72,7 @@ const Step3Address: React.FC = () => {
     const selectedState = e.target.value;
     setForm({ ...form, state: selectedState, city: "" });
     handleCity(selectedState);
-    validateField("state", selectedState); // 
+    validateField("state", selectedState); 
   };
 
   const handleSelectCityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -109,7 +109,7 @@ const Step3Address: React.FC = () => {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-4 lg:p-8">
+    <div className="bg-white rounded-2xl shadow-lg bg-white/80 backdrop-blur-sm border border-gray-100 p-6 lg:p-10 transition-all duration-300">
       <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-3">
         Address Information <span className="text-red-500">*</span>
       </h2>
@@ -125,7 +125,7 @@ const Step3Address: React.FC = () => {
             placeholder="House No, Street"
             value={form.line1}
             onChange={handleChange}
-            className={`w-full ${errors.line1 ? "border-red-500" : ""}`}
+            className={`mt-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-xl transition-all w-full ${errors.line1 ? "border-red-500" : ""}`}
           />
           {errors.line1 && <p className="text-red-500 text-sm">{errors.line1}</p>}
         </div>
@@ -140,7 +140,7 @@ const Step3Address: React.FC = () => {
             placeholder="Apartment, Floor, Block"
             value={form.line2}
             onChange={handleChange}
-            className={`w-full ${errors.line2 ? "border-red-500" : ""}`}
+            className={`mt-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-xl transition-all w-full ${errors.line2 ? "border-red-500" : ""}`}
           />
           {errors.line2 && <p className="text-red-500 text-sm">{errors.line2}</p>}
         </div>
@@ -155,7 +155,7 @@ const Step3Address: React.FC = () => {
             placeholder="Nearby Landmark"
             value={form.landmark}
             onChange={handleChange}
-            className={`w-full ${errors.landmark ? "border-red-500" : ""}`}
+            className={`mt-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-xl transition-all w-full ${errors.landmark ? "border-red-500" : ""}`}
           />
           {errors.landmark && <p className="text-red-500 text-sm">{errors.landmark}</p>}
         </div>
@@ -170,22 +170,12 @@ const Step3Address: React.FC = () => {
             placeholder="Postal / Zip Code"
             value={form.zip}
             onChange={handleChange}
-            className={`w-full ${errors.zip ? "border-red-500" : ""}`}
+            className={`mt-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-xl transition-all w-full ${errors.zip ? "border-red-500" : ""}`}
           />
           {errors.zip && <p className="text-red-500 text-sm">{errors.zip}</p>}
         </div>
 
-        <div>
-          <Label htmlFor="country" className="mb-1 text-gray-700 font-medium block">
-            Country <span className="text-red-500">*</span>
-          </Label>
-          <Input
-            type="text"
-            value={country}
-            disabled
-            className="w-full bg-gray-100 text-gray-600"
-          />
-        </div>
+        
 
         <div>
           <Label htmlFor="state" className="mb-1 text-gray-700 font-medium block">
@@ -195,7 +185,7 @@ const Step3Address: React.FC = () => {
             name="state"
             value={form.state}
             onChange={handleSelectStateChange}
-            className={`w-full border border-gray-300 rounded-lg p-2 bg-white text-gray-700 
+            className={`w-full mt-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-xl p-3 bg-white text-gray-700 transition-all 
               ${errors.state ? "border-red-500" : "border-gray-300"}`}
           >
             <option value="">Select your state</option>
@@ -219,7 +209,7 @@ const Step3Address: React.FC = () => {
             value={form.city}
             onChange={handleSelectCityChange}
             disabled={citiesForState.length === 0}
-            className={`w-full border border-gray-300 rounded-lg p-2 bg-white text-gray-700 
+            className={`w-full mt-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-xl p-3 bg-white text-gray-700 transition-all
               ${errors.city ? "border-red-500" : "border-gray-300"}`}
           >
             <option value="">Select your city</option>
@@ -230,6 +220,18 @@ const Step3Address: React.FC = () => {
             ))}
           </select>
           {errors.city && <p className="text-red-500 text-sm">{errors.city}</p>}
+        </div>
+
+        <div>
+          <Label htmlFor="country" className="mb-1 text-gray-700 font-medium block">
+            Country <span className="text-red-500">*</span>
+          </Label>
+          <Input
+            type="text"
+            value={country}
+            disabled
+            className="mt-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-xl transition-all w-full bg-gray-100 text-gray-600"
+          />
         </div>
       </div>
 

@@ -6,7 +6,7 @@ interface FormState {
     [key: string]: any;
   };
 }
-const savedFormData = localStorage.getItem('formData');
+const savedFormData = sessionStorage.getItem('formData');
 const initialState: FormState = {
   step: 1,
   data: savedFormData
@@ -50,12 +50,12 @@ const formSlice = createSlice({
     },
     updateForm: (state, action: PayloadAction<Record<string, any>>) => {
       state.data = { ...state.data, ...action.payload };
-      localStorage.setItem('formData', JSON.stringify(state.data));
+      sessionStorage.setItem('formData', JSON.stringify(state.data));
     },
     resetForm: (state) => {
       state.step = 1;
       state.data = {};
-      localStorage.removeItem('formData');
+      sessionStorage.removeItem('formData');
     },
     setStep: (state, action: PayloadAction<number>) => {
       state.step = action.payload;
