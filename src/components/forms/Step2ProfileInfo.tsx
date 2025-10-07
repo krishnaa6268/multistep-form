@@ -19,6 +19,8 @@ type ProfileFormValues = {
 
 const Step2Profile: React.FC = () => {
 
+  const [pictureError, setPictureError] = useState<string | null>(null);
+
   //--------Ravi Lodhi's Server Endpoints----------------
   // const BASE_URL = "http://192.168.29.28:9001/upload";
   //const SERVER_STORE = "http://192.168.29.28:9001/storage/";
@@ -68,6 +70,7 @@ const Step2Profile: React.FC = () => {
         const newUrl = SERVER_STORE + fileName;
         //{ console.log(newUrl, fileName) }
 
+        if (pictureError) setPictureError(null);
         setValue("picture", fileName);
         setValue("pictureUrl", newUrl);
         dispatch(updateForm({ profile: { ...watchAll, picture: fileName, pictureUrl: newUrl } }));
@@ -86,7 +89,20 @@ const Step2Profile: React.FC = () => {
         dispatch(updateForm({ profile: { ...watchAll, [field]: e.target.value } }));
       };
 
+  const handleDeletePhoto = () => {
+    setValue("picture", null);
+    setValue("pictureUrl", "");
+    dispatch(updateForm({ profile: { ...watchAll, picture: null, pictureUrl: "" } }));
+  };
+
   const onSubmit = (data: ProfileFormValues) => {
+    if (!data.pictureUrl || data.pictureUrl.trim() === "") {
+      setPictureError("Profile picture is required");
+      return; // Stop submission
+    } else {
+      setPictureError(null);
+    }
+
     dispatch(updateForm({ profile: data }));
     dispatch(nextStep());
   };
@@ -133,12 +149,24 @@ const Step2Profile: React.FC = () => {
               className="mt-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-xl transition-all w-full"
               {...register("dob", {
                 required: "Date of Birth is required",
+                validate: (value) => {
+                  if (!value) return "Date of Birth is required";
+
+                  const today = new Date();
+                  const dob = new Date(value);
+                  const ageDiff = today.getFullYear() - dob.getFullYear();
+                  const monthDiff = today.getMonth() - dob.getMonth();
+                  const dayDiff = today.getDate() - dob.getDate();
+
+                  const age = monthDiff < 0 || (monthDiff === 0 && dayDiff < 0) ? ageDiff - 1 : ageDiff;
+                  if (age < 18) return "You must be at least 18 years old";
+                  return true;
+                },
                 onChange: handleReduxChange("dob"),
               })}
             />
-            {errors.dob && (
-              <p className="text-red-500 text-sm mt-1">{errors.dob.message}</p>
-            )}
+
+            {errors.dob && <p className="text-red-500 text-sm">{errors.dob.message}</p>}
           </div>
 
           <div className="flex-1">
@@ -161,13 +189,24 @@ const Step2Profile: React.FC = () => {
               </p>
 
               {watchAll.pictureUrl && (
-                <div className="mt-4 flex items-center justify-center">
+                <div className="relative mt-4 flex items-center justify-center">
                   <img
                     src={watchAll.pictureUrl}
                     alt="Profile Preview"
                     className="h-24 w-24 rounded-full border-4 border-white shadow-md object-cover ring-2 ring-blue-200 transition-all hover:scale-105"
                   />
+                  <button
+                    type="button"
+                    onClick={handleDeletePhoto}
+                    className="absolute h-7 w-7 top-0 right-0 bg-gray-200 px-1 rounded-full border-2 border-white text-blue-600 hover:text-red-800 text-sm font-bold"
+                  >
+                    X
+                  </button>
                 </div>
+              )}
+
+              {pictureError && (
+                <p className="text-red-500 text-sm mt-1">{pictureError}</p>
               )}
             </div>
             {/* {watchAll.pictureUrl && (
