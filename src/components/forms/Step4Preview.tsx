@@ -113,7 +113,7 @@ const Step4Preview: React.FC = () => {
         isLastStep
         onSubmit={() => {
           alert("Form submitted!");
-          // localStorage.removeItem("formData");
+          // sessionStorage.removeItem("formData");
           window.location.reload();
         }}
       />

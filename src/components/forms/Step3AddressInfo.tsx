@@ -111,7 +111,7 @@ const Step3Address: React.FC = () => {
   return (
     <div className="bg-white rounded-2xl shadow-lg bg-white/80 backdrop-blur-sm border border-gray-100 p-6 lg:p-10 transition-all duration-300">
       <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-3">
-        Address Information <span className="text-red-500">*</span>
+        Address Information 
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

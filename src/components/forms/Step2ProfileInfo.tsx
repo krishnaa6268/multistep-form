@@ -143,7 +143,7 @@ const Step2Profile: React.FC = () => {
 
           <div className="flex-1">
             <Label htmlFor="picture" className="mb-1 text-gray-700 font-medium block">
-              Profile Picture
+              Profile Picture<span className="text-red-500">*</span>
             </Label>
             <div className="mt-2 border-2 border-dashed border-gray-300 rounded-xl p-4 flex flex-col items-center justify-center hover:border-blue-400 hover:bg-blue-50 transition-all cursor-pointer">
               <Input
